@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>CompositeOT.results &#8212; CompositeOT</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=72f51813" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=6408d415" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CompositeOT.solver" href="CompositeOT.solver.html" />
+    <link rel="prev" title="CompositeOT.options" href="CompositeOT.options.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">CompositeOT</a></h1>
+
+
+
+<p class="blurb">A Python solver for composite optimal transport.</p>
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#public-modules">Public Modules</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API Reference</a><ul>
+      <li>Previous: <a href="CompositeOT.options.html" title="previous chapter">CompositeOT.options</a></li>
+      <li>Next: <a href="CompositeOT.solver.html" title="next chapter">CompositeOT.solver</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-CompositeOT.results">
+<span id="compositeot-results"></span><h1>CompositeOT.results<a class="headerlink" href="#module-CompositeOT.results" title="Link to this heading">¶</a></h1>
+<p>Reusable solution, result, and history containers for CompositeOT.</p>
+<p>These classes deliberately store NumPy arrays by reference. Constructing a
+<code class="docutils literal notranslate"><span class="pre">PrimalSolution</span></code> or <code class="docutils literal notranslate"><span class="pre">DualSolution</span></code> is cheap; copying only happens in the
+methods that explicitly create new arrays, such as <code class="docutils literal notranslate"><span class="pre">zeros</span></code> or <code class="docutils literal notranslate"><span class="pre">update</span></code>.</p>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">append_solver_history</span></code>(history, iteration, ...)</p></td>
+<td><p>Append one PALM or reporting checkpoint to a mutable history.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">freeze_history</span></code>(history)</p></td>
+<td><p>Return a read-only history with tuple-valued columns.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_solver_result</span></code>(primal, dual, ...[, ...])</p></td>
+<td><p>Build an immutable <code class="docutils literal notranslate"><span class="pre">SolverResult</span></code> from final diagnostics and history.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">new_solver_history</span></code>()</p></td>
+<td><p>Create the mutable history dictionary used while a solver is running.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ADMMResult</span></code>(primal, dual, iterations, ...)</p></td>
+<td><p>Solution and diagnostics returned by <code class="docutils literal notranslate"><span class="pre">admm</span></code> or <code class="docutils literal notranslate"><span class="pre">sgsadmm</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DualSolution</span></code>(W, u, v)</p></td>
+<td><p>Dual variables <code class="docutils literal notranslate"><span class="pre">(W,</span> <span class="pre">u,</span> <span class="pre">v)</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">PrimalSolution</span></code>(X, D, y, z)</p></td>
+<td><p>Primal variables <code class="docutils literal notranslate"><span class="pre">(X,</span> <span class="pre">D,</span> <span class="pre">y,</span> <span class="pre">z)</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SolverResult</span></code>(primal, dual, auxiliary_error, ...)</p></td>
+<td><p>Solution and diagnostics returned by <code class="docutils literal notranslate"><span class="pre">solve</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &#169;2026, CompositeOT contributors.
+      
+      |
+      <a href="../_sources/generated/CompositeOT.results.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

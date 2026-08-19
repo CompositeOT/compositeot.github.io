@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Examples &#8212; CompositeOT</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=72f51813" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=6408d415" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="api.html" />
+    <link rel="prev" title="User Guide" href="user_guide.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">CompositeOT</a></h1>
+
+
+
+<p class="blurb">A Python solver for composite optimal transport.</p>
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#generating-data">Generating Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#benchmark-methodology">Benchmark Methodology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qrot">QROT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#uot">UOT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gqot">GQOT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#partial-ot">Partial OT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#partial-gqot">Partial GQOT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#martingale-ot">Martingale OT</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="user_guide.html" title="previous chapter">User Guide</a></li>
+      <li>Next: <a href="api.html" title="next chapter">API Reference</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h1>
+<p>The examples are designed to be runnable from the repository root.  Each one
+follows the same workflow:</p>
+<ol class="arabic simple">
+<li><p>generate <code class="docutils literal notranslate"><span class="pre">C</span></code>, <code class="docutils literal notranslate"><span class="pre">alpha</span></code>, and <code class="docutils literal notranslate"><span class="pre">beta</span></code>;</p></li>
+<li><p>add any extra data such as groups, transported mass, or side constraints;</p></li>
+<li><p>construct a <code class="docutils literal notranslate"><span class="pre">Model</span></code>;</p></li>
+<li><p>call <code class="docutils literal notranslate"><span class="pre">solve</span></code> and inspect the printed diagnostics.</p></li>
+</ol>
+<section id="generating-data">
+<h2>Generating Data<a class="headerlink" href="#generating-data" title="Link to this heading">¶</a></h2>
+<p>Most examples start from the same three arrays:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">C</span></code></dt><dd><p>the <code class="docutils literal notranslate"><span class="pre">m</span></code> by <code class="docutils literal notranslate"><span class="pre">n</span></code> transport cost matrix;</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">alpha</span></code></dt><dd><p>the source marginal with shape <code class="docutils literal notranslate"><span class="pre">(m,)</span></code>;</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">beta</span></code></dt><dd><p>the target marginal with shape <code class="docutils literal notranslate"><span class="pre">(n,)</span></code>.</p>
+</dd>
+</dl>
+<p>The source and target point clouds are only used to build these arrays.  The
+solver receives <code class="docutils literal notranslate"><span class="pre">C</span></code>, <code class="docutils literal notranslate"><span class="pre">alpha</span></code>, and <code class="docutils literal notranslate"><span class="pre">beta</span></code>.</p>
+<p>A complete construction is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">dimension</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+<span class="n">means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">20.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">5.0</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">sample_cloud</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">rng</span><span class="p">):</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">means</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="n">weights</span> <span class="o">/=</span> <span class="n">weights</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="n">components</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">means</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">dimension</span> <span class="o">*</span> <span class="n">size</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+    <span class="n">support</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">means</span><span class="p">[</span><span class="n">components</span><span class="p">],</span> <span class="n">sigma</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dimension</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="n">mass</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">size</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">mass</span> <span class="o">/=</span> <span class="n">mass</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">support</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">mass</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">normalized_squared_distance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+    <span class="n">source_sq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">source</span> <span class="o">*</span> <span class="n">source</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">target_sq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">target</span> <span class="o">*</span> <span class="n">target</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">source_sq</span> <span class="o">+</span> <span class="n">target_sq</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">source</span> <span class="o">@</span> <span class="n">target</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">C</span><span class="p">)</span>
+
+    <span class="n">max_cost</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">C</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">max_cost</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">C</span> <span class="o">/=</span> <span class="n">max_cost</span>
+    <span class="k">return</span> <span class="n">C</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+<span class="n">source</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">sample_cloud</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
+<span class="n">target</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="n">sample_cloud</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
+<span class="n">C</span> <span class="o">=</span> <span class="n">normalized_squared_distance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After this block, the arrays passed to <code class="docutils literal notranslate"><span class="pre">Model</span></code> are:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">C</span><span class="o">.</span><span class="n">shape</span>      <span class="c1"># (m, n)</span>
+<span class="n">alpha</span><span class="o">.</span><span class="n">shape</span>  <span class="c1"># (m,)</span>
+<span class="n">beta</span><span class="o">.</span><span class="n">shape</span>   <span class="c1"># (n,)</span>
+<span class="n">alpha</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c1"># 1.0</span>
+<span class="n">beta</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>   <span class="c1"># 1.0</span>
+</pre></div>
+</div>
+<p>Here <code class="docutils literal notranslate"><span class="pre">C[i,</span> <span class="pre">j]</span></code> is the normalized squared distance between source point <code class="docutils literal notranslate"><span class="pre">i</span></code>
+and target point <code class="docutils literal notranslate"><span class="pre">j</span></code>.  The entries <code class="docutils literal notranslate"><span class="pre">alpha[i]</span></code> and <code class="docutils literal notranslate"><span class="pre">beta[j]</span></code> are
+nonnegative masses, normalized so that each marginal sums to one.</p>
+<p>The examples below show real solver transcripts from the commands listed in
+each section.  Wall-clock times can change across machines.</p>
+</section>
+<section id="benchmark-methodology">
+<h2>Benchmark Methodology<a class="headerlink" href="#benchmark-methodology" title="Link to this heading">¶</a></h2>
+<p>The following local benchmark uses the six public example scripts with their
+default CLI settings and <code class="docutils literal notranslate"><span class="pre">m</span> <span class="pre">=</span> <span class="pre">n</span></code> in <code class="docutils literal notranslate"><span class="pre">{1000,</span> <span class="pre">2000,</span> <span class="pre">3000,</span> <span class="pre">4000,</span> <span class="pre">5000}</span></code>. Each
+script was warmed once on a small instance before timing. Times are wall-clock
+seconds on the local development machine and should be read as implementation
+checks, not portable performance guarantees. All runs below converged.</p>
+</section>
+<section id="qrot">
+<h2>QROT<a class="headerlink" href="#qrot" title="Link to this heading">¶</a></h2>
+<p>Problem:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\min_X\quad
+   &amp; \langle C, X\rangle
+   + \underbrace{\delta_{\mathbb R_+^{m\times n}}(X)
+   + \frac{1}{2}\|X\|_F^2}_{R(X)} \\
+\mathrm{s.t.}\quad
+   &amp; X\mathbf{1} = \alpha, \\
+   &amp; X^\top\mathbf{1} = \beta.
+\end{aligned}\end{split}\]</div>
+<p>The displayed formula matches the example default
+<code class="docutils literal notranslate"><span class="pre">NonnegativeQuadraticRegularizer(1.0)</span></code>.</p>
+<p>Data generation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">source</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">sample_cloud</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
+<span class="n">target</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="n">sample_cloud</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
+<span class="n">C</span> <span class="o">=</span> <span class="n">normalized_squared_distance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Model and solve:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">CompositeOT</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">NonnegativeQuadraticRegularizer</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;QROT&quot;</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_transport_regularizer</span><span class="p">(</span><span class="n">NonnegativeQuadraticRegularizer</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>examples/example_qrot.py<span class="w"> </span>--m<span class="w"> </span><span class="m">30</span><span class="w"> </span>--n<span class="w"> </span><span class="m">30</span><span class="w"> </span>--max-iterations<span class="w"> </span><span class="m">50</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--admm-iterations<span class="w"> </span><span class="m">300</span><span class="w"> </span>--tolerance<span class="w"> </span>1e-6
+</pre></div>
+</div>
+<p>Output:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span> iter |          pobj |          dobj |     gap |    pres |    dres |     kkt |    time |   sigma
+  100 |  7.613867e-02 |  7.738603e-02 | 1.1e-03 | 4.0e-04 | 1.2e-03 | 1.2e-03 | 3.5e-02 | 1.3e-01
+  200 |  7.740318e-02 |  7.741253e-02 | 8.1e-06 | 1.6e-05 | 7.3e-06 | 1.6e-05 | 6.9e-02 | 1.4e-01
+ iter |          pobj |          dobj |     gap |    pres |    dres |     kkt |    time |   sigma |     tau |   inner
+    0 |  7.740318e-02 |  7.741253e-02 | 8.1e-06 | 1.6e-05 | 7.3e-06 | 1.6e-05 | 0.0e+00 | 1.0e+00 | 5.0e+00 |       0
+    1 |  7.742561e-02 |  7.741254e-02 | 1.1e-05 | 1.3e-05 | 3.8e-05 | 3.8e-05 | 1.3e-02 | 1.0e+00 | 5.0e+00 |       1
+    2 |  7.742796e-02 |  7.741255e-02 | 1.3e-05 | 7.9e-06 | 4.6e-05 | 4.6e-05 | 1.4e-02 | 1.5e+00 | 5.0e+00 |       2
+    3 |  7.742946e-02 |  7.741257e-02 | 1.5e-05 | 3.1e-06 | 4.8e-05 | 4.8e-05 | 1.6e-02 | 2.2e+00 | 5.0e+00 |       4
+    4 |  7.742787e-02 |  7.741259e-02 | 1.3e-05 | 3.1e-06 | 4.0e-05 | 4.0e-05 | 1.7e-02 | 3.4e+00 | 5.0e+00 |       5
+    5 |  7.742270e-02 |  7.741259e-02 | 8.7e-06 | 4.4e-06 | 2.3e-05 | 2.3e-05 | 1.9e-02 | 5.1e+00 | 5.0e+00 |       6
+    6 |  7.741637e-02 |  7.741259e-02 | 3.3e-06 | 3.0e-06 | 6.7e-06 | 6.7e-06 | 2.0e-02 | 7.6e+00 | 5.0e+00 |       7
+    7 |  7.741267e-02 |  7.741259e-02 | 6.7e-08 | 9.3e-07 | 1.4e-06 | 1.4e-06 | 2.1e-02 | 1.1e+01 | 5.0e+00 |       8
+    8 |  7.741211e-02 |  7.741259e-02 | 4.2e-07 | 8.9e-08 | 1.1e-06 | 1.1e-06 | 2.2e-02 | 1.7e+01 | 5.0e+00 |       9
+    9 |  7.741245e-02 |  7.741259e-02 | 1.3e-07 | 4.7e-08 | 2.5e-07 | 2.5e-07 | 2.3e-02 | 2.6e+01 | 5.0e+00 |      10
+
+QROT
+  converged: True (Converged with max(KKT residual, relative gap).)
+  iterations: 9 outer, 200 ADMM
+  objective:  7.741245e-02
+  dual objective:  7.741259e-02
+  relative gap: 1.3e-07
+  feasibility: 2.5e-07
+  stationarity: 4.7e-08
+  KKT residual: 2.5e-07
+  time: 1.7e-01 s
+</pre></div>
+</div>
+<table class="docutils align-left" id="id1">
+<caption><span class="caption-text">Test results</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>n=m</p></th>
+<th class="head"><p>time (s)</p></th>
+<th class="head"><p>outer</p></th>
+<th class="head"><p>ADMM</p></th>
+<th class="head"><p>KKT</p></th>
+<th class="head"><p>objective</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1000</p></td>
+<td><p>2.5</p></td>
+<td><p>16</p></td>
+<td><p>200</p></td>
+<td><p>3.5e-07</p></td>
+<td><p>1.158346e-02</p></td>
+</tr>
+<tr class="row-odd"><td><p>2000</p></td>
+<td><p>8.7</p></td>
+<td><p>16</p></td>
+<td><p>200</p></td>
+<td><p>6.4e-07</p></td>
+<td><p>1.943852e-02</p></td>
+</tr>
+<tr class="row-even"><td><p>3000</p></td>
+<td><p>16.7</p></td>
+<td><p>16</p></td>
+<td><p>200</p></td>
+<td><p>7.3e-07</p></td>
+<td><p>2.872860e-02</p></td>
+</tr>
+<tr class="row-odd"><td><p>4000</p></td>
+<td><p>29.5</p></td>
+<td><p>16</p></td>
+<td><p>200</p></td>
+<td><p>8.8e-07</p></td>
+<td><p>2.946718e-02</p></td>
+</tr>
+<tr class="row-even"><td><p>5000</p></td>
+<td><p>47.4</p></td>
+<td><p>17</p></td>
+<td><p>200</p></td>
+<td><p>4.5e-07</p></td>
+<td><p>1.219550e-02</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="uot">
+<h2>UOT<a class="headerlink" href="#uot" title="Link to this heading">¶</a></h2>
+<p>The UOT example adds noisy source support points and reduces target mass, then
+relaxes the marginal equations with squared-l2 slack penalties.</p>
+<p>Problem:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\min_{X,y,z}\quad
+   &amp; \langle C, X\rangle
+   + \underbrace{\delta_{\mathbb R_+^{m\times n}}(X)
+   + \frac{1}{2}\|X\|_F^2}_{R(X)}
+   + \underbrace{\frac{1}{2}\|y\|_2^2}_{p_r(y)}
+   + \underbrace{\frac{1}{2}\|z\|_2^2}_{p_c(z)} \\
+\mathrm{s.t.}\quad
+   &amp; X\mathbf{1} + y = \alpha, \\
+   &amp; X^\top\mathbf{1} + z = \beta.
+\end{aligned}\end{split}\]</div>
+<p>The displayed formula uses the example defaults
+<code class="docutils literal notranslate"><span class="pre">lambda_q</span> <span class="pre">=</span> <span class="pre">lambda_r</span> <span class="pre">=</span> <span class="pre">lambda_c</span> <span class="pre">=</span> <span class="pre">1</span></code>.</p>
+<p>Additional data generation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">source</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">sample_cloud</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
+
+<span class="n">noise_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">noise_ratio</span> <span class="o">*</span> <span class="n">m</span><span class="p">))</span>
+<span class="n">indices</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">noise_count</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="n">indices</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">spread</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="n">indices</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-6</span>
+<span class="n">noise</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
+    <span class="n">loc</span><span class="o">=</span><span class="n">center</span> <span class="o">+</span> <span class="mf">2.5</span> <span class="o">*</span> <span class="n">spread</span><span class="p">,</span>
+    <span class="n">scale</span><span class="o">=</span><span class="mf">1.2</span> <span class="o">*</span> <span class="n">spread</span><span class="p">,</span>
+    <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">noise_count</span><span class="p">,</span> <span class="n">dimension</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">source</span><span class="p">,</span> <span class="n">noise</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">alpha</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">noise_count</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">m</span><span class="p">)])</span>
+
+<span class="n">target</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="n">sample_cloud</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
+<span class="n">beta</span> <span class="o">*=</span> <span class="n">target_mass</span>
+<span class="n">C</span> <span class="o">=</span> <span class="n">normalized_squared_distance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Model and solve:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">CompositeOT</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">NonnegativeQuadraticRegularizer</span><span class="p">,</span> <span class="n">SquaredL2Regularizer</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;UOT-sqL2&quot;</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_transport_regularizer</span><span class="p">(</span><span class="n">NonnegativeQuadraticRegularizer</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_row_regularizer</span><span class="p">(</span><span class="n">SquaredL2Regularizer</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_column_regularizer</span><span class="p">(</span><span class="n">SquaredL2Regularizer</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>examples/example_uot.py<span class="w"> </span>--m<span class="w"> </span><span class="m">30</span><span class="w"> </span>--n<span class="w"> </span><span class="m">30</span><span class="w"> </span>--max-iterations<span class="w"> </span><span class="m">50</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--admm-iterations<span class="w"> </span><span class="m">300</span><span class="w"> </span>--tolerance<span class="w"> </span>1e-6
+</pre></div>
+</div>
+<p>Output:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span> iter |          pobj |          dobj |     gap |    pres |    dres |     kkt |    time |   sigma
+  100 |  2.295842e-02 |  2.369224e-02 | 7.0e-04 | 4.5e-04 | 1.2e-03 | 1.2e-03 | 6.9e-02 | 1.6e-01
+  200 |  2.370868e-02 |  2.371484e-02 | 5.9e-06 | 2.5e-06 | 7.1e-06 | 7.1e-06 | 1.2e-01 | 1.8e-01
+ iter |          pobj |          dobj |     gap |    pres |    dres |     kkt |    time |   sigma |     tau |   inner
+    0 |  2.370868e-02 |  2.371484e-02 | 5.9e-06 | 2.5e-06 | 7.1e-06 | 7.1e-06 | 0.0e+00 | 1.0e+00 | 5.0e+00 |       0
+    1 |  2.371451e-02 |  2.371484e-02 | 3.1e-07 | 1.6e-06 | 5.2e-06 | 5.2e-06 | 1.2e-02 | 1.0e+00 | 5.0e+00 |       1
+    2 |  2.371457e-02 |  2.371484e-02 | 2.6e-07 | 5.9e-07 | 5.9e-06 | 5.9e-06 | 1.4e-02 | 1.5e+00 | 5.0e+00 |       2
+    3 |  2.371472e-02 |  2.371484e-02 | 1.1e-07 | 4.5e-07 | 4.1e-06 | 4.1e-06 | 1.5e-02 | 2.2e+00 | 5.0e+00 |       3
+    4 |  2.371481e-02 |  2.371484e-02 | 3.2e-08 | 4.9e-07 | 1.2e-06 | 1.2e-06 | 1.6e-02 | 3.4e+00 | 5.0e+00 |       4
+    5 |  2.371484e-02 |  2.371484e-02 | 3.0e-09 | 1.6e-07 | 3.9e-07 | 3.9e-07 | 1.8e-02 | 5.1e+00 | 5.0e+00 |       5
+
+UOT-sqL2
+  converged: True (Converged with max(KKT residual, relative gap).)
+  iterations: 5 outer, 200 ADMM
+  objective:  2.371484e-02
+  dual objective:  2.371484e-02
+  relative gap: 3.0e-09
+  feasibility: 3.9e-07
+  stationarity: 1.6e-07
+  KKT residual: 3.9e-07
+  time: 2.0e-01 s
+</pre></div>
+</div>
+<table class="docutils align-left" id="id2">
+<caption><span class="caption-text">Test results</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>n=m</p></th>
+<th class="head"><p>time (s)</p></th>
+<th class="head"><p>outer</p></th>
+<th class="head"><p>ADMM</p></th>
+<th class="head"><p>KKT</p></th>
+<th class="head"><p>objective</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1000</p></td>
+<td><p>2.8</p></td>
+<td><p>15</p></td>
+<td><p>300</p></td>
+<td><p>4.0e-07</p></td>
+<td><p>8.644641e-04</p></td>
+</tr>
+<tr class="row-odd"><td><p>2000</p></td>
+<td><p>10.7</p></td>
+<td><p>15</p></td>
+<td><p>300</p></td>
+<td><p>9.3e-07</p></td>
+<td><p>5.268401e-04</p></td>
+</tr>
+<tr class="row-even"><td><p>3000</p></td>
+<td><p>21.8</p></td>
+<td><p>16</p></td>
+<td><p>300</p></td>
+<td><p>5.4e-07</p></td>
+<td><p>2.893390e-04</p></td>
+</tr>
+<tr class="row-odd"><td><p>4000</p></td>
+<td><p>36.4</p></td>
+<td><p>16</p></td>
+<td><p>300</p></td>
+<td><p>5.9e-07</p></td>
+<td><p>2.550819e-04</p></td>
+</tr>
+<tr class="row-even"><td><p>5000</p></td>
+<td><p>57.6</p></td>
+<td><p>16</p></td>
+<td><p>300</p></td>
+<td><p>7.6e-07</p></td>
+<td><p>2.042758e-04</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="gqot">
+<h2>GQOT<a class="headerlink" href="#gqot" title="Link to this heading">¶</a></h2>
+<p>GQOT uses a group-quadratic transport regularizer.  With the example defaults
+<code class="docutils literal notranslate"><span class="pre">lambda1</span> <span class="pre">=</span> <span class="pre">lambda2</span> <span class="pre">=</span> <span class="pre">1</span></code>, the problem is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\min_X\quad
+   &amp; \langle C, X\rangle
+   + \underbrace{\delta_{\mathbb R_+^{m\times n}}(X)
+   + \sum_G w_G\|X_G\|_2
+   + \frac{1}{2}\|X\|_F^2}_{R(X)} \\
+\mathrm{s.t.}\quad
+   &amp; X\mathbf{1} = \alpha, \\
+   &amp; X^\top\mathbf{1} = \beta.
+\end{aligned}\end{split}\]</div>
+<p>Additional data generation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">/</span> <span class="n">m</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+
+<span class="n">source_1</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">([</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">m</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">source_2</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">m</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">source_1</span><span class="p">,</span> <span class="n">source_2</span><span class="p">])</span>
+
+<span class="n">components</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+<span class="n">target_1</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
+    <span class="p">[</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="nb">int</span><span class="p">((</span><span class="n">components</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+<span class="p">)</span>
+<span class="n">target_2</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
+    <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="nb">int</span><span class="p">((</span><span class="n">components</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+<span class="p">)</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">target_1</span><span class="p">,</span> <span class="n">target_2</span><span class="p">])</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">target</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])]</span>
+
+<span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">source</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">target</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">C</span><span class="p">)</span>
+
+<span class="n">row_groups</span><span class="p">,</span> <span class="n">row_group_weights</span> <span class="o">=</span> <span class="n">build_row_groups</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n_groups</span><span class="p">)</span>
+<span class="n">groups</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">build_composite_groups</span><span class="p">(</span><span class="n">row_groups</span><span class="p">,</span> <span class="n">row_group_weights</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Model and solve:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">CompositeOT</span><span class="w"> </span><span class="kn">import</span> <span class="n">GroupQuadraticRegularizer</span><span class="p">,</span> <span class="n">Model</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;GQOT&quot;</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_transport_regularizer</span><span class="p">(</span>
+    <span class="n">GroupQuadraticRegularizer</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>examples/example_gqot.py<span class="w"> </span>--m<span class="w"> </span><span class="m">30</span><span class="w"> </span>--n<span class="w"> </span><span class="m">30</span><span class="w"> </span>--max-iterations<span class="w"> </span><span class="m">50</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--admm-iterations<span class="w"> </span><span class="m">300</span><span class="w"> </span>--tolerance<span class="w"> </span>1e-6
+</pre></div>
+</div>
+<p>Output:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span> iter |          pobj |          dobj |     gap |    pres |    dres |     kkt |    time |   sigma
+  100 |  2.921846e+00 |  2.676532e+00 | 3.7e-02 | 2.6e-04 | 1.1e-03 | 1.1e-03 | 6.3e-02 | 3.9e-03
+  200 |  2.940436e+00 |  2.781999e+00 | 2.4e-02 | 1.1e-03 | 6.6e-06 | 1.1e-03 | 9.3e-02 | 7.9e-03
+  300 |  2.933704e+00 |  2.889504e+00 | 6.5e-03 | 5.8e-04 | 3.9e-08 | 5.8e-04 | 1.3e-01 | 1.6e-02
+ iter |          pobj |          dobj |     gap |    pres |    dres |     kkt |    time |   sigma |     tau |   inner
+    0 |  2.933704e+00 |  2.889504e+00 | 6.5e-03 | 5.8e-04 | 3.9e-08 | 5.8e-04 | 0.0e+00 | 1.0e+00 | 5.0e+00 |       0
+    1 |  2.937066e+00 |  2.912616e+00 | 3.6e-03 | 3.9e-04 | 6.5e-04 | 6.5e-04 | 7.7e-03 | 1.0e+00 | 5.0e+00 |       1
+    2 |  2.937361e+00 |  2.932253e+00 | 7.4e-04 | 6.7e-05 | 8.1e-04 | 8.1e-04 | 9.8e-03 | 1.5e+00 | 5.0e+00 |       3
+    3 |  2.933667e+00 |  2.932610e+00 | 1.5e-04 | 4.4e-05 | 2.0e-04 | 2.0e-04 | 1.2e-02 | 2.2e+00 | 5.0e+00 |       5
+    4 |  2.932672e+00 |  2.932820e+00 | 2.1e-05 | 1.5e-05 | 3.7e-05 | 3.7e-05 | 1.4e-02 | 3.4e+00 | 5.0e+00 |       7
+    5 |  2.932804e+00 |  2.932848e+00 | 6.4e-06 | 5.3e-07 | 1.2e-05 | 1.2e-05 | 1.5e-02 | 5.1e+00 | 5.0e+00 |       9
+    6 |  2.932848e+00 |  2.932848e+00 | 7.9e-08 | 3.6e-07 | 2.4e-07 | 3.6e-07 | 1.6e-02 | 7.6e+00 | 5.0e+00 |      10
+
+GQOT
+  converged: True (Converged with max(KKT residual, relative gap).)
+  iterations: 6 outer, 300 ADMM
+  objective:  2.932848e+00
+  dual objective:  2.932848e+00
+  relative gap: 7.9e-08
+  feasibility: 2.4e-07
+  stationarity: 3.6e-07
+  KKT residual: 3.6e-07
+  time: 2.1e-01 s
+</pre></div>
+</div>
+<table class="docutils align-left" id="id3">
+<caption><span class="caption-text">Test results</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>n=m</p></th>
+<th class="head"><p>time (s)</p></th>
+<th class="head"><p>outer</p></th>
+<th class="head"><p>ADMM</p></th>
+<th class="head"><p>KKT</p></th>
+<th class="head"><p>objective</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1000</p></td>
+<td><p>5.5</p></td>
+<td><p>6</p></td>
+<td><p>100</p></td>
+<td><p>1.9e-07</p></td>
+<td><p>3.523607e+00</p></td>
+</tr>
+<tr class="row-odd"><td><p>2000</p></td>
+<td><p>20.8</p></td>
+<td><p>6</p></td>
+<td><p>100</p></td>
+<td><p>1.1e-07</p></td>
+<td><p>3.599602e+00</p></td>
+</tr>
+<tr class="row-even"><td><p>3000</p></td>
+<td><p>45.2</p></td>
+<td><p>6</p></td>
+<td><p>100</p></td>
+<td><p>1.3e-07</p></td>
+<td><p>3.423097e+00</p></td>
+</tr>
+<tr class="row-odd"><td><p>4000</p></td>
+<td><p>95.8</p></td>
+<td><p>6</p></td>
+<td><p>100</p></td>
+<td><p>1.0e-08</p></td>
+<td><p>3.500836e+00</p></td>
+</tr>
+<tr class="row-even"><td><p>5000</p></td>
+<td><p>142.7</p></td>
+<td><p>5</p></td>
+<td><p>100</p></td>
+<td><p>6.8e-08</p></td>
+<td><p>3.505960e+00</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="partial-ot">
+<h2>Partial OT<a class="headerlink" href="#partial-ot" title="Link to this heading">¶</a></h2>
+<p>Partial OT adds a transported-mass equality and nonnegative marginal slacks.</p>
+<p>Problem:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\min_{X,D,y,z}\quad
+   &amp; \langle C, X\rangle
+   + \underbrace{\delta_{\mathbb R_+^{m\times n}}(X)}_{R(X)}
+   + \underbrace{\delta_{\{D=0\}}(D)}_{h(D)}
+   + \underbrace{\delta_{\{y \ge 0\}}(y)}_{p_r(y)}
+   + \underbrace{\delta_{\{z \ge 0\}}(z)}_{p_c(z)} \\
+\mathrm{s.t.}\quad
+   &amp; \mathbf{1}^\top X\mathbf{1} + D = S, \\
+   &amp; X\mathbf{1} + y = \alpha, \\
+   &amp; X^\top\mathbf{1} + z = \beta.
+\end{aligned}\end{split}\]</div>
+<p>The displayed formula uses the example default <code class="docutils literal notranslate"><span class="pre">lambda_q</span> <span class="pre">=</span> <span class="pre">0</span></code>, so
+<code class="docutils literal notranslate"><span class="pre">NonnegativeQuadraticRegularizer(0.0)</span></code> reduces to the nonnegativity
+indicator.</p>
+<p>Additional data generation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">source</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">sample_cloud</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
+<span class="n">target</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="n">sample_cloud</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
+<span class="n">beta</span> <span class="o">*=</span> <span class="n">target_mass</span>
+<span class="n">C</span> <span class="o">=</span> <span class="n">normalized_squared_distance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+
+<span class="n">mass</span> <span class="o">=</span> <span class="n">partial_fraction</span> <span class="o">*</span> <span class="nb">min</span><span class="p">(</span><span class="n">alpha</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">beta</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">mass</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here <code class="docutils literal notranslate"><span class="pre">S</span></code> is a <code class="docutils literal notranslate"><span class="pre">1</span></code> by <code class="docutils literal notranslate"><span class="pre">1</span></code> array containing the transported mass.</p>
+<p>Model and solve:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">CompositeOT</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">NonnegativeIndicator</span><span class="p">,</span> <span class="n">NonnegativeQuadraticRegularizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">CompositeOT</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZeroIndicator</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;partialOT&quot;</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_side_constraint</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">regularizer</span><span class="o">=</span><span class="n">ZeroIndicator</span><span class="p">())</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_transport_regularizer</span><span class="p">(</span><span class="n">NonnegativeQuadraticRegularizer</span><span class="p">(</span><span class="mf">0.0</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_row_regularizer</span><span class="p">(</span><span class="n">NonnegativeIndicator</span><span class="p">())</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_column_regularizer</span><span class="p">(</span><span class="n">NonnegativeIndicator</span><span class="p">())</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>examples/example_partial_ot.py<span class="w"> </span>--m<span class="w"> </span><span class="m">30</span><span class="w"> </span>--n<span class="w"> </span><span class="m">30</span><span class="w"> </span>--max-iterations<span class="w"> </span><span class="m">50</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--admm-iterations<span class="w"> </span><span class="m">300</span><span class="w"> </span>--tolerance<span class="w"> </span>1e-6
+</pre></div>
+</div>
+<p>Output:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span> iter |          pobj |          dobj |     gap |    pres |    dres |     kkt |    time |   sigma
+  100 |  1.495809e-02 |  1.029147e-02 | 4.6e-03 | 4.0e-03 | 2.1e-03 | 4.0e-03 | 3.3e-02 | 1.6e-01
+  200 |  1.211361e-02 |  1.201502e-02 | 9.6e-05 | 1.1e-03 | 2.9e-04 | 1.1e-03 | 6.4e-02 | 1.8e-01
+  300 |  1.271181e-02 |  1.237412e-02 | 3.3e-04 | 4.3e-04 | 4.0e-04 | 4.3e-04 | 8.9e-02 | 2.0e-01
+ iter |          pobj |          dobj |     gap |    pres |    dres |     kkt |    time |   sigma |     tau |   inner
+    0 |  1.271181e-02 |  1.237412e-02 | 3.3e-04 | 4.3e-04 | 4.0e-04 | 4.3e-04 | 0.0e+00 | 1.0e+00 | 5.0e+00 |       0
+    1 |  1.220788e-02 |  1.261389e-02 | 4.0e-04 | 5.2e-04 | 5.8e-04 | 5.8e-04 | 1.3e-02 | 1.0e+00 | 5.0e+00 |       1
+    2 |  1.221506e-02 |  1.236338e-02 | 1.4e-04 | 3.8e-04 | 5.5e-04 | 5.5e-04 | 1.5e-02 | 1.5e+00 | 5.0e+00 |       2
+    3 |  1.222131e-02 |  1.229473e-02 | 7.2e-05 | 3.4e-04 | 4.9e-04 | 4.9e-04 | 1.6e-02 | 2.2e+00 | 5.0e+00 |       3
+    4 |  1.224285e-02 |  1.229965e-02 | 5.5e-05 | 3.2e-04 | 4.1e-04 | 4.1e-04 | 1.8e-02 | 3.4e+00 | 5.0e+00 |       4
+    5 |  1.227615e-02 |  1.232814e-02 | 5.1e-05 | 3.1e-04 | 2.6e-04 | 3.1e-04 | 2.1e-02 | 5.1e+00 | 5.0e+00 |       6
+    6 |  1.231037e-02 |  1.234306e-02 | 3.2e-05 | 2.9e-04 | 7.8e-05 | 2.9e-04 | 2.2e-02 | 7.6e+00 | 5.0e+00 |       7
+    7 |  1.232623e-02 |  1.234534e-02 | 1.9e-05 | 2.2e-04 | 1.5e-04 | 2.2e-04 | 2.4e-02 | 1.1e+01 | 5.0e+00 |       8
+    8 |  1.231086e-02 |  1.234526e-02 | 3.4e-05 | 2.0e-04 | 1.1e-04 | 2.0e-04 | 2.7e-02 | 1.7e+01 | 5.0e+00 |      10
+    9 |  1.228021e-02 |  1.233521e-02 | 5.4e-05 | 1.7e-04 | 1.6e-05 | 1.7e-04 | 2.9e-02 | 2.6e+01 | 5.0e+00 |      12
+   10 |  1.226433e-02 |  1.231150e-02 | 4.6e-05 | 1.3e-04 | 5.2e-05 | 1.3e-04 | 3.2e-02 | 3.8e+01 | 5.0e+00 |      14
+   11 |  1.226895e-02 |  1.228843e-02 | 1.9e-05 | 6.1e-05 | 1.9e-05 | 6.1e-05 | 3.5e-02 | 5.8e+01 | 5.0e+00 |      16
+   12 |  1.227114e-02 |  1.227055e-02 | 5.7e-07 | 2.1e-06 | 8.6e-06 | 8.6e-06 | 3.6e-02 | 8.6e+01 | 5.0e+00 |      17
+   13 |  1.227094e-02 |  1.227082e-02 | 1.2e-07 | 6.3e-07 | 3.2e-07 | 6.3e-07 | 3.8e-02 | 1.3e+02 | 5.0e+00 |      18
+
+partialOT
+  converged: True (Converged with KKT residual below tolerance.)
+  iterations: 13 outer, 300 ADMM
+  objective:  1.227094e-02
+  dual objective:  1.227082e-02
+  relative gap: 1.2e-07
+  feasibility: 3.2e-07
+  stationarity: 6.3e-07
+  KKT residual: 6.3e-07
+  time: 1.9e-01 s
+</pre></div>
+</div>
+<table class="docutils align-left" id="id4">
+<caption><span class="caption-text">Test results</span><a class="headerlink" href="#id4" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>n=m</p></th>
+<th class="head"><p>time (s)</p></th>
+<th class="head"><p>outer</p></th>
+<th class="head"><p>ADMM</p></th>
+<th class="head"><p>KKT</p></th>
+<th class="head"><p>objective</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1000</p></td>
+<td><p>5.9</p></td>
+<td><p>19</p></td>
+<td><p>300</p></td>
+<td><p>8.3e-07</p></td>
+<td><p>1.787773e-03</p></td>
+</tr>
+<tr class="row-odd"><td><p>2000</p></td>
+<td><p>20.5</p></td>
+<td><p>19</p></td>
+<td><p>300</p></td>
+<td><p>6.8e-07</p></td>
+<td><p>3.371333e-03</p></td>
+</tr>
+<tr class="row-even"><td><p>3000</p></td>
+<td><p>40.7</p></td>
+<td><p>19</p></td>
+<td><p>300</p></td>
+<td><p>7.2e-07</p></td>
+<td><p>7.765692e-04</p></td>
+</tr>
+<tr class="row-odd"><td><p>4000</p></td>
+<td><p>75.7</p></td>
+<td><p>19</p></td>
+<td><p>300</p></td>
+<td><p>6.0e-07</p></td>
+<td><p>1.539107e-03</p></td>
+</tr>
+<tr class="row-even"><td><p>5000</p></td>
+<td><p>121.9</p></td>
+<td><p>19</p></td>
+<td><p>300</p></td>
+<td><p>5.9e-07</p></td>
+<td><p>2.014684e-03</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="partial-gqot">
+<h2>Partial GQOT<a class="headerlink" href="#partial-gqot" title="Link to this heading">¶</a></h2>
+<p>Partial GQOT combines the transported-mass equality with the group-quadratic
+transport regularizer.</p>
+<p>Problem:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\min_{X,D,y,z}\quad
+   &amp; \langle C, X\rangle
+   + \underbrace{\delta_{\mathbb R_+^{m\times n}}(X)
+   + \sum_G w_G\|X_G\|_2
+   + \frac{1}{2}\|X\|_F^2}_{R(X)}
+   + \underbrace{\delta_{\{D=0\}}(D)}_{h(D)}
+   + \underbrace{\delta_{\{y \ge 0\}}(y)}_{p_r(y)}
+   + \underbrace{\delta_{\{z \ge 0\}}(z)}_{p_c(z)} \\
+\mathrm{s.t.}\quad
+   &amp; \mathbf{1}^\top X\mathbf{1} + D = S, \\
+   &amp; X\mathbf{1} + y = \alpha, \\
+   &amp; X^\top\mathbf{1} + z = \beta.
+\end{aligned}\end{split}\]</div>
+<p>The displayed formula matches the example defaults
+<code class="docutils literal notranslate"><span class="pre">GroupQuadraticRegularizer(1.0,</span> <span class="pre">1.0,</span> <span class="pre">groups,</span> <span class="pre">weights)</span></code>.</p>
+<p>Additional data generation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use the same two-cluster support, cost, and groups as GQOT.</span>
+<span class="n">mass</span> <span class="o">=</span> <span class="n">partial_fraction</span> <span class="o">*</span> <span class="nb">min</span><span class="p">(</span><span class="n">alpha</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">beta</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">mass</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here <code class="docutils literal notranslate"><span class="pre">S</span></code> is a <code class="docutils literal notranslate"><span class="pre">1</span></code> by <code class="docutils literal notranslate"><span class="pre">1</span></code> array containing the transported mass.</p>
+<p>Model and solve:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">CompositeOT</span><span class="w"> </span><span class="kn">import</span> <span class="n">GroupQuadraticRegularizer</span><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">NonnegativeIndicator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">CompositeOT</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZeroIndicator</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;partialGQOT&quot;</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_side_constraint</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">regularizer</span><span class="o">=</span><span class="n">ZeroIndicator</span><span class="p">())</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_transport_regularizer</span><span class="p">(</span>
+    <span class="n">GroupQuadraticRegularizer</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_row_regularizer</span><span class="p">(</span><span class="n">NonnegativeIndicator</span><span class="p">())</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_column_regularizer</span><span class="p">(</span><span class="n">NonnegativeIndicator</span><span class="p">())</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>examples/example_partial_gqot.py<span class="w"> </span>--m<span class="w"> </span><span class="m">30</span><span class="w"> </span>--n<span class="w"> </span><span class="m">30</span><span class="w"> </span>--max-iterations<span class="w"> </span><span class="m">50</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--admm-iterations<span class="w"> </span><span class="m">300</span><span class="w"> </span>--tolerance<span class="w"> </span>1e-6
+</pre></div>
+</div>
+<p>Output:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span> iter |          pobj |          dobj |     gap |    pres |    dres |     kkt |    time |   sigma
+  100 |  1.785726e+00 | -1.287959e+01 | 9.4e-01 | 9.3e-03 | 5.5e-03 | 9.3e-03 | 3.6e-02 | 3.9e-03
+  200 |  1.918703e+00 |  2.039848e+00 | 2.4e-02 | 2.9e-02 | 2.6e-03 | 2.9e-02 | 7.9e-02 | 7.9e-03
+  300 |  1.754797e+00 |  1.836680e+00 | 1.8e-02 | 8.5e-03 | 2.2e-04 | 8.5e-03 | 1.2e-01 | 1.2e-02
+ iter |          pobj |          dobj |     gap |    pres |    dres |     kkt |    time |   sigma |     tau |   inner
+    0 |  1.754797e+00 |  1.836680e+00 | 1.8e-02 | 8.5e-03 | 2.2e-04 | 8.5e-03 | 0.0e+00 | 1.0e+00 | 5.0e+00 |       0
+    1 |  1.715029e+00 |  1.816955e+00 | 2.2e-02 | 7.8e-03 | 3.0e-03 | 7.8e-03 | 1.8e-02 | 1.0e+00 | 5.0e+00 |       1
+    2 |  1.688271e+00 |  1.797810e+00 | 2.4e-02 | 5.8e-03 | 5.9e-03 | 5.9e-03 | 2.1e-02 | 1.5e+00 | 5.0e+00 |       2
+    3 |  1.666377e+00 |  1.758886e+00 | 2.1e-02 | 2.6e-03 | 6.8e-03 | 6.8e-03 | 2.3e-02 | 2.2e+00 | 5.0e+00 |       3
+    4 |  1.658572e+00 |  1.716444e+00 | 1.3e-02 | 1.3e-03 | 5.2e-03 | 5.2e-03 | 2.6e-02 | 3.4e+00 | 5.0e+00 |       4
+    5 |  1.681173e+00 |  1.702907e+00 | 5.0e-03 | 6.3e-04 | 2.7e-03 | 2.7e-03 | 3.0e-02 | 5.1e+00 | 5.0e+00 |       6
+    6 |  1.721739e+00 |  1.710142e+00 | 2.6e-03 | 3.5e-04 | 5.5e-04 | 5.5e-04 | 3.4e-02 | 7.6e+00 | 5.0e+00 |       8
+    7 |  1.735164e+00 |  1.724764e+00 | 2.3e-03 | 2.5e-04 | 7.0e-04 | 7.0e-04 | 4.0e-02 | 1.1e+01 | 5.0e+00 |      11
+    8 |  1.728020e+00 |  1.726737e+00 | 2.9e-04 | 2.4e-04 | 2.2e-04 | 2.4e-04 | 4.6e-02 | 1.7e+01 | 5.0e+00 |      14
+    9 |  1.723977e+00 |  1.724980e+00 | 2.3e-04 | 8.8e-05 | 4.1e-05 | 8.8e-05 | 5.0e-02 | 2.6e+01 | 5.0e+00 |      16
+   10 |  1.724148e+00 |  1.724583e+00 | 9.8e-05 | 2.8e-05 | 2.3e-05 | 2.8e-05 | 5.4e-02 | 3.8e+01 | 5.0e+00 |      18
+   11 |  1.724380e+00 |  1.724467e+00 | 2.0e-05 | 6.9e-06 | 4.8e-06 | 6.9e-06 | 5.8e-02 | 5.8e+01 | 5.0e+00 |      20
+   12 |  1.724446e+00 |  1.724450e+00 | 8.7e-07 | 1.2e-06 | 8.2e-07 | 1.2e-06 | 6.2e-02 | 8.6e+01 | 5.0e+00 |      22
+   13 |  1.724457e+00 |  1.724455e+00 | 6.1e-07 | 2.1e-07 | 3.4e-07 | 3.4e-07 | 6.5e-02 | 1.3e+02 | 5.0e+00 |      23
+
+partialGQOT
+  converged: True (Converged with KKT residual below tolerance.)
+  iterations: 13 outer, 300 ADMM
+  objective:  1.724457e+00
+  dual objective:  1.724455e+00
+  relative gap: 6.1e-07
+  feasibility: 3.4e-07
+  stationarity: 2.1e-07
+  KKT residual: 3.4e-07
+  time: 2.5e-01 s
+</pre></div>
+</div>
+<table class="docutils align-left" id="id5">
+<caption><span class="caption-text">Test results</span><a class="headerlink" href="#id5" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>n=m</p></th>
+<th class="head"><p>time (s)</p></th>
+<th class="head"><p>outer</p></th>
+<th class="head"><p>ADMM</p></th>
+<th class="head"><p>KKT</p></th>
+<th class="head"><p>objective</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1000</p></td>
+<td><p>23.1</p></td>
+<td><p>14</p></td>
+<td><p>300</p></td>
+<td><p>4.0e-07</p></td>
+<td><p>2.034433e+00</p></td>
+</tr>
+<tr class="row-odd"><td><p>2000</p></td>
+<td><p>106.4</p></td>
+<td><p>15</p></td>
+<td><p>300</p></td>
+<td><p>7.1e-07</p></td>
+<td><p>2.082043e+00</p></td>
+</tr>
+<tr class="row-even"><td><p>3000</p></td>
+<td><p>209.8</p></td>
+<td><p>15</p></td>
+<td><p>300</p></td>
+<td><p>3.7e-07</p></td>
+<td><p>1.990608e+00</p></td>
+</tr>
+<tr class="row-odd"><td><p>4000</p></td>
+<td><p>465.6</p></td>
+<td><p>14</p></td>
+<td><p>300</p></td>
+<td><p>5.6e-07</p></td>
+<td><p>2.033895e+00</p></td>
+</tr>
+<tr class="row-even"><td><p>5000</p></td>
+<td><p>1404.4</p></td>
+<td><p>14</p></td>
+<td><p>300</p></td>
+<td><p>5.8e-07</p></td>
+<td><p>2.031234e+00</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="martingale-ot">
+<h2>Martingale OT<a class="headerlink" href="#martingale-ot" title="Link to this heading">¶</a></h2>
+<p>For a source grid <code class="docutils literal notranslate"><span class="pre">x</span></code> and target grid <code class="docutils literal notranslate"><span class="pre">y</span></code>, the row-wise martingale
+condition is</p>
+<div class="math notranslate nohighlight">
+\[\sum_j X_{ij} y_j = \alpha_i x_i.\]</div>
+<p>The default example uses the nonnegativity indicator for transport and a soft
+squared-l2 penalty with weight <code class="docutils literal notranslate"><span class="pre">10</span></code> for the martingale side residual:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\min_{X,D}\quad
+   &amp; \langle C, X\rangle
+   + \underbrace{\delta_{\mathbb R_+^{m\times n}}(X)}_{R(X)}
+   + \underbrace{5\|D\|_F^2}_{h(D)} \\
+\mathrm{s.t.}\quad
+   &amp; X\mathbf{1} = \alpha, \\
+   &amp; X^\top\mathbf{1} = \beta, \\
+   &amp; A X B + D = S.
+\end{aligned}\end{split}\]</div>
+<p>Additional data generation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">C</span> <span class="o">=</span> <span class="p">(</span><span class="n">grid</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">grid</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])</span> <span class="o">**</span> <span class="mi">2</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">grid</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">grid</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Model and solve:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">CompositeOT</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">NonnegativeIndicator</span><span class="p">,</span> <span class="n">SquaredL2Regularizer</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;martingaleOT&quot;</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_side_constraint</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">regularizer</span><span class="o">=</span><span class="n">SquaredL2Regularizer</span><span class="p">(</span><span class="mf">10.0</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_transport_regularizer</span><span class="p">(</span><span class="n">NonnegativeIndicator</span><span class="p">())</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>examples/example_martingale_ot.py<span class="w"> </span>--m<span class="w"> </span><span class="m">30</span><span class="w"> </span>--n<span class="w"> </span><span class="m">30</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--max-iterations<span class="w"> </span><span class="m">50</span><span class="w"> </span>--admm-iterations<span class="w"> </span><span class="m">300</span><span class="w"> </span>--tolerance<span class="w"> </span>1e-6
+</pre></div>
+</div>
+<p>Output:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span> iter |          pobj |          dobj |     gap |    pres |    dres |     kkt |    time |   sigma
+  100 |  8.431897e-03 | -2.910307e-03 | 1.1e-02 | 1.8e-03 | 1.1e-03 | 1.8e-03 | 4.4e-02 | 3.0e-02
+  200 |  5.228534e-03 |  9.127654e-03 | 3.8e-03 | 1.9e-03 | 6.7e-06 | 1.9e-03 | 7.4e-02 | 3.3e-02
+  300 |  2.538075e-03 |  3.735982e-03 | 1.2e-03 | 8.1e-04 | 3.9e-08 | 8.1e-04 | 1.1e-01 | 5.0e-02
+ iter |          pobj |          dobj |     gap |    pres |    dres |     kkt |    time |   sigma |     tau |   inner
+    0 |  2.538075e-03 |  3.735982e-03 | 1.2e-03 | 8.1e-04 | 3.9e-08 | 8.1e-04 | 0.0e+00 | 1.0e+00 | 5.0e+00 |       0
+    1 |  2.752968e-03 |  3.735982e-03 | 9.8e-04 | 8.1e-04 | 2.1e-04 | 8.1e-04 | 2.1e-03 | 1.0e+00 | 5.0e+00 |       0
+    2 |  2.710355e-03 |  3.476042e-03 | 7.6e-04 | 7.1e-04 | 3.9e-04 | 7.1e-04 | 1.1e-02 | 1.5e+00 | 5.0e+00 |       1
+    3 |  2.671802e-03 |  3.129956e-03 | 4.6e-04 | 6.3e-04 | 4.0e-04 | 6.3e-04 | 1.3e-02 | 2.2e+00 | 5.0e+00 |       2
+    4 |  2.615871e-03 |  3.081132e-03 | 4.6e-04 | 6.2e-04 | 2.1e-04 | 6.2e-04 | 1.5e-02 | 3.4e+00 | 5.0e+00 |       3
+    5 |  2.533586e-03 |  3.109927e-03 | 5.7e-04 | 6.2e-04 | 1.4e-04 | 6.2e-04 | 1.6e-02 | 5.1e+00 | 5.0e+00 |       4
+    6 |  2.409122e-03 |  3.109927e-03 | 7.0e-04 | 6.2e-04 | 2.4e-04 | 6.2e-04 | 1.7e-02 | 7.6e+00 | 5.0e+00 |       4
+    7 |  2.220604e-03 |  3.124237e-03 | 9.0e-04 | 6.2e-04 | 7.0e-05 | 6.2e-04 | 1.8e-02 | 1.1e+01 | 5.0e+00 |       5
+    8 |  1.938234e-03 |  3.118465e-03 | 1.2e-03 | 6.2e-04 | 1.9e-05 | 6.2e-04 | 2.0e-02 | 1.7e+01 | 5.0e+00 |       6
+    9 |  1.516953e-03 |  3.118465e-03 | 1.6e-03 | 6.2e-04 | 2.1e-04 | 6.2e-04 | 2.0e-02 | 2.6e+01 | 5.0e+00 |       6
+   10 |  8.839857e-04 |  3.113663e-03 | 2.2e-03 | 6.2e-04 | 2.8e-05 | 6.2e-04 | 2.2e-02 | 3.8e+01 | 5.0e+00 |       7
+   11 |  1.185572e-08 |  2.910703e-03 | 2.9e-03 | 4.7e-04 | 8.6e-06 | 4.7e-04 | 2.5e-02 | 5.8e+01 | 5.0e+00 |       9
+   12 |  4.539665e-10 |  9.650556e-07 | 9.6e-07 | 1.6e-07 | 1.6e-05 | 1.6e-05 | 2.6e-02 | 8.6e+01 | 5.0e+00 |      10
+   13 |  1.755685e-13 | -6.443327e-07 | 6.4e-07 | 1.0e-07 | 1.1e-07 | 1.1e-07 | 2.8e-02 | 1.3e+02 | 5.0e+00 |      11
+
+martingaleOT
+  converged: True (Converged with max(KKT residual, relative gap).)
+  iterations: 13 outer, 300 ADMM
+  objective:  1.755685e-13
+  dual objective: -6.443327e-07
+  relative gap: 6.4e-07
+  feasibility: 1.1e-07
+  stationarity: 1.0e-07
+  KKT residual: 1.1e-07
+  time: 2.0e-01 s
+</pre></div>
+</div>
+<table class="docutils align-left" id="id6">
+<caption><span class="caption-text">Test results</span><a class="headerlink" href="#id6" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>n=m</p></th>
+<th class="head"><p>time (s)</p></th>
+<th class="head"><p>outer</p></th>
+<th class="head"><p>ADMM</p></th>
+<th class="head"><p>KKT</p></th>
+<th class="head"><p>objective</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1000</p></td>
+<td><p>6.6</p></td>
+<td><p>20</p></td>
+<td><p>300</p></td>
+<td><p>8.0e-07</p></td>
+<td><p>6.983665e-06</p></td>
+</tr>
+<tr class="row-odd"><td><p>2000</p></td>
+<td><p>33.2</p></td>
+<td><p>18</p></td>
+<td><p>300</p></td>
+<td><p>7.5e-07</p></td>
+<td><p>8.102010e-06</p></td>
+</tr>
+<tr class="row-even"><td><p>3000</p></td>
+<td><p>66.2</p></td>
+<td><p>20</p></td>
+<td><p>300</p></td>
+<td><p>2.9e-07</p></td>
+<td><p>3.613601e-06</p></td>
+</tr>
+<tr class="row-odd"><td><p>4000</p></td>
+<td><p>114.1</p></td>
+<td><p>19</p></td>
+<td><p>100</p></td>
+<td><p>3.0e-07</p></td>
+<td><p>3.877028e-06</p></td>
+</tr>
+<tr class="row-even"><td><p>5000</p></td>
+<td><p>189.5</p></td>
+<td><p>15</p></td>
+<td><p>100</p></td>
+<td><p>8.8e-07</p></td>
+<td><p>9.910263e-06</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &#169;2026, CompositeOT contributors.
+      
+      |
+      <a href="_sources/examples.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

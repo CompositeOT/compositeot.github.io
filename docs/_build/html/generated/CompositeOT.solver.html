@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>CompositeOT.solver &#8212; CompositeOT</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=72f51813" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=6408d415" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="CompositeOT.results" href="CompositeOT.results.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">CompositeOT</a></h1>
+
+
+
+<p class="blurb">A Python solver for composite optimal transport.</p>
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#public-modules">Public Modules</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API Reference</a><ul>
+      <li>Previous: <a href="CompositeOT.results.html" title="previous chapter">CompositeOT.results</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-CompositeOT.solver">
+<span id="compositeot-solver"></span><h1>CompositeOT.solver<a class="headerlink" href="#module-CompositeOT.solver" title="Link to this heading">¶</a></h1>
+<p>Public CompositeOT solve entry point.</p>
+<p><code class="docutils literal notranslate"><span class="pre">solve</span></code> is the high-level routine used by <code class="docutils literal notranslate"><span class="pre">CompositeOTProblem.solve</span></code> and
+<code class="docutils literal notranslate"><span class="pre">CompositeOTModel.solve</span></code>.  It always scales the problem internally, optionally
+runs SGS-ADMM for a first-order warm start, and finishes with PALM for
+high-accuracy termination.</p>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve</span></code>(problem[, palm_options, admm_options, ...])</p></td>
+<td><p>Solve a CompositeOT problem.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_scaled</span></code>(problem, palm_options, admm_options)</p></td>
+<td><p>Solve an already scaled problem.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &#169;2026, CompositeOT contributors.
+      
+      |
+      <a href="../_sources/generated/CompositeOT.solver.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

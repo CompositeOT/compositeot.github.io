@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>CompositeOT.model &#8212; CompositeOT</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=72f51813" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=6408d415" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CompositeOT.regularizers" href="CompositeOT.regularizers.html" />
+    <link rel="prev" title="API Reference" href="../api.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">CompositeOT</a></h1>
+
+
+
+<p class="blurb">A Python solver for composite optimal transport.</p>
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#public-modules">Public Modules</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API Reference</a><ul>
+      <li>Previous: <a href="../api.html" title="previous chapter">API Reference</a></li>
+      <li>Next: <a href="CompositeOT.regularizers.html" title="next chapter">CompositeOT.regularizers</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-CompositeOT.model">
+<span id="compositeot-model"></span><h1>CompositeOT.model<a class="headerlink" href="#module-CompositeOT.model" title="Link to this heading">¶</a></h1>
+<p>Problem representation for the CompositeOT solver.</p>
+<p>This module intentionally separates two concepts:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Model</span></code> will be the mutable, user-facing builder, similar in spirit to
+Gurobi or Mosek modeling objects.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CompositeOTProblem</span></code> is the immutable compiled representation consumed by
+the numerical solver.</p></li>
+</ul>
+<p>The compiled problem mirrors the paper’s template:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">min</span> <span class="o">&lt;</span><span class="n">C</span><span class="p">,</span> <span class="n">X</span><span class="o">&gt;</span> <span class="o">+</span> <span class="n">R</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">+</span> <span class="n">h</span><span class="p">(</span><span class="n">D</span><span class="p">)</span> <span class="o">+</span> <span class="n">p_r</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="n">p_c</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">t</span><span class="o">.</span> <span class="n">A</span> <span class="n">X</span> <span class="n">B</span> <span class="o">+</span> <span class="n">D</span> <span class="o">=</span> <span class="n">S</span><span class="p">,</span>
+     <span class="n">X</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">y</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">,</span>
+     <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">z</span> <span class="o">=</span> <span class="n">beta</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>For now this object is NumPy-first and component-agnostic. By default it
+specializes to the classic OT model:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">min</span> <span class="o">&lt;</span><span class="n">C</span><span class="p">,</span> <span class="n">X</span><span class="o">&gt;</span>
+<span class="n">s</span><span class="o">.</span><span class="n">t</span><span class="o">.</span> <span class="n">X</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span>
+     <span class="n">X</span> <span class="mi">1</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">,</span>
+     <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="mi">1</span> <span class="o">=</span> <span class="n">beta</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>The side relation is stored explicitly as <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">X</span> <span class="pre">B</span> <span class="pre">+</span> <span class="pre">D</span> <span class="pre">=</span> <span class="pre">S</span></code> to match the paper
+directly when side constraints are supplied.</p>
+<p>Notation used throughout the package:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">X</span></code></dt><dd><p>Transport plan with shape <code class="docutils literal notranslate"><span class="pre">(m,</span> <span class="pre">n)</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">D</span></code></dt><dd><p>Slack for the side relation <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">X</span> <span class="pre">B</span> <span class="pre">+</span> <span class="pre">D</span> <span class="pre">=</span> <span class="pre">S</span></code>.  It has shape <code class="docutils literal notranslate"><span class="pre">S.shape</span></code>;
+with no side relation it is the empty <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">0)</span></code> array.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">y</span></code> and <code class="docutils literal notranslate"><span class="pre">z</span></code></dt><dd><p>Row and column marginal slacks.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">W</span></code>, <code class="docutils literal notranslate"><span class="pre">u</span></code>, and <code class="docutils literal notranslate"><span class="pre">v</span></code></dt><dd><p>Dual variables for the side, row, and column equations.</p>
+</dd>
+</dl>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeOTModel</span></code>(C, alpha, beta[, name, ...])</p></td>
+<td><p>Mutable user-facing builder for CompositeOT problems.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeOTProblem</span></code>(C, alpha, beta[, ...])</p></td>
+<td><p>Immutable compiled CompositeOT problem.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Model</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &#169;2026, CompositeOT contributors.
+      
+      |
+      <a href="../_sources/generated/CompositeOT.model.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>User Guide &#8212; CompositeOT</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=72f51813" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=6408d415" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Quickstart" href="quickstart.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">CompositeOT</a></h1>
+
+
+
+<p class="blurb">A Python solver for composite optimal transport.</p>
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#problem-form">Problem Form</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model-components">Model Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#common-models">Common Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scaling">Scaling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#solving">Solving</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="quickstart.html" title="previous chapter">Quickstart</a></li>
+      <li>Next: <a href="examples.html" title="next chapter">Examples</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="user-guide">
+<h1>User Guide<a class="headerlink" href="#user-guide" title="Link to this heading">¶</a></h1>
+<section id="problem-form">
+<h2>Problem Form<a class="headerlink" href="#problem-form" title="Link to this heading">¶</a></h2>
+<p>CompositeOT models a transport plan <code class="docutils literal notranslate"><span class="pre">X</span></code> with optional side slack <code class="docutils literal notranslate"><span class="pre">D</span></code> and
+marginal slacks <code class="docutils literal notranslate"><span class="pre">y</span></code> and <code class="docutils literal notranslate"><span class="pre">z</span></code>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\min_{X,D,y,z}\quad
+   &amp; \langle C, X\rangle + R(X) + h(D) + p_r(y) + p_c(z) \\
+\mathrm{s.t.}\quad
+   &amp; A X B + D = S, \\
+   &amp; X\mathbf{1} + y = \alpha, \\
+   &amp; X^\top\mathbf{1} + z = \beta.
+\end{aligned}\end{split}\]</div>
+<p>The side relation <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">X</span> <span class="pre">B</span> <span class="pre">+</span> <span class="pre">D</span> <span class="pre">=</span> <span class="pre">S</span></code> is optional.  If no side constraint is
+added, the model only enforces the row and column marginal equations.</p>
+</section>
+<section id="model-components">
+<h2>Model Components<a class="headerlink" href="#model-components" title="Link to this heading">¶</a></h2>
+<p>A model has four regularizer slots:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">transport</span></code></dt><dd><p>The regularizer <code class="docutils literal notranslate"><span class="pre">R(X)</span></code> on the transport plan. Typical choices are
+<code class="docutils literal notranslate"><span class="pre">NonnegativeIndicator</span></code>, <code class="docutils literal notranslate"><span class="pre">NonnegativeQuadraticRegularizer</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">GroupQuadraticRegularizer</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">side</span></code></dt><dd><p>The regularizer <code class="docutils literal notranslate"><span class="pre">h(D)</span></code> for side-constraint slack. <code class="docutils literal notranslate"><span class="pre">ZeroIndicator</span></code> makes
+the side relation hard; <code class="docutils literal notranslate"><span class="pre">SquaredL2Regularizer</span></code> makes it soft.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">row</span></code> and <code class="docutils literal notranslate"><span class="pre">column</span></code></dt><dd><p>The marginal slack regularizers <code class="docutils literal notranslate"><span class="pre">p_r(y)</span></code> and <code class="docutils literal notranslate"><span class="pre">p_c(z)</span></code>. <code class="docutils literal notranslate"><span class="pre">ZeroIndicator</span></code>
+gives hard balanced marginals, while nonnegative or squared-l2 choices
+produce partial and unbalanced variants.</p>
+</dd>
+</dl>
+</section>
+<section id="common-models">
+<h2>Common Models<a class="headerlink" href="#common-models" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>Balanced OT</dt><dd><p>Use the default transport nonnegativity and default hard marginals.</p>
+</dd>
+<dt>QROT</dt><dd><p>Add <code class="docutils literal notranslate"><span class="pre">NonnegativeQuadraticRegularizer(lambda_q)</span></code> on the transport plan.</p>
+</dd>
+<dt>UOT</dt><dd><p>Add row and column penalties, for example <code class="docutils literal notranslate"><span class="pre">SquaredL2Regularizer</span></code>.</p>
+</dd>
+<dt>Partial OT</dt><dd><p>Add a transported-mass side constraint and nonnegative marginal slacks.</p>
+</dd>
+<dt>GQOT</dt><dd><p>Add <code class="docutils literal notranslate"><span class="pre">GroupQuadraticRegularizer(lambda1,</span> <span class="pre">lambda2,</span> <span class="pre">groups,</span> <span class="pre">weights)</span></code>.</p>
+</dd>
+<dt>Martingale OT</dt><dd><p>Add a side relation <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">X</span> <span class="pre">B</span> <span class="pre">=</span> <span class="pre">S</span></code> representing the martingale moment
+condition.  Use <code class="docutils literal notranslate"><span class="pre">ZeroIndicator</span></code> for a hard constraint or
+<code class="docutils literal notranslate"><span class="pre">SquaredL2Regularizer</span></code> for a soft constraint.</p>
+</dd>
+</dl>
+</section>
+<section id="scaling">
+<h2>Scaling<a class="headerlink" href="#scaling" title="Link to this heading">¶</a></h2>
+<p>By default <code class="docutils literal notranslate"><span class="pre">solve</span></code> scales the problem internally and unscales the returned
+solution and diagnostics. Users should normally pass the original data and let
+the solver handle scaling.</p>
+</section>
+<section id="solving">
+<h2>Solving<a class="headerlink" href="#solving" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">model.solve()</span></code> is the recommended entry point.  It uses a first-order warm
+start followed by a PALM refinement step.  Set
+<code class="docutils literal notranslate"><span class="pre">ADMMOptions(max_iterations=0)</span></code> when you want to start PALM directly.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">CompositeOT</span><span class="w"> </span><span class="kn">import</span> <span class="n">ADMMOptions</span><span class="p">,</span> <span class="n">PALMOptions</span>
+
+<span class="n">palm</span> <span class="o">=</span> <span class="n">PALMOptions</span><span class="p">(</span><span class="n">max_iterations</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">5.0</span><span class="p">)</span>
+<span class="n">warm</span> <span class="o">=</span> <span class="n">ADMMOptions</span><span class="p">(</span><span class="n">max_iterations</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">palm_options</span><span class="o">=</span><span class="n">palm</span><span class="p">,</span> <span class="n">admm_options</span><span class="o">=</span><span class="n">warm</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="results">
+<h2>Results<a class="headerlink" href="#results" title="Link to this heading">¶</a></h2>
+<p>The returned <code class="docutils literal notranslate"><span class="pre">SolverResult</span></code> contains:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">result.primal</span></code> with <code class="docutils literal notranslate"><span class="pre">X</span></code>, <code class="docutils literal notranslate"><span class="pre">D</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, and <code class="docutils literal notranslate"><span class="pre">z</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">result.dual</span></code> with <code class="docutils literal notranslate"><span class="pre">W</span></code>, <code class="docutils literal notranslate"><span class="pre">u</span></code>, and <code class="docutils literal notranslate"><span class="pre">v</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">result.objective_value</span></code> and <code class="docutils literal notranslate"><span class="pre">result.dual_objective_value</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">result.relative_gap</span></code>, <code class="docutils literal notranslate"><span class="pre">result.primal_residual</span></code>,
+<code class="docutils literal notranslate"><span class="pre">result.dual_residual</span></code>, and <code class="docutils literal notranslate"><span class="pre">result.kkt_residual</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">result.history</span></code> for iteration diagnostics.</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &#169;2026, CompositeOT contributors.
+      
+      |
+      <a href="_sources/user_guide.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

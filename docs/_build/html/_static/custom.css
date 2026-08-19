@@ -1,0 +1,99 @@
+body {
+  color: #1f2933;
+  background: #f7fafc;
+  font-size: 16px;
+  line-height: 1.58;
+}
+
+div.document {
+  margin: 24px auto;
+}
+
+div.body {
+  border-radius: 6px;
+  border: 1px solid #d8e2ec;
+  box-shadow: 0 10px 30px rgba(15, 79, 125, 0.08);
+}
+
+div.sphinxsidebar {
+  font-size: 0.94rem;
+}
+
+div.sphinxsidebar h3,
+div.sphinxsidebar h4 {
+  color: #2b5b84;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+a {
+  color: #1f77b4;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #0f4f7d;
+  text-decoration: underline;
+}
+
+div.body h1,
+div.body h2,
+div.body h3 {
+  color: #1f2933;
+  letter-spacing: 0;
+}
+
+div.body h1 {
+  border-bottom: 1px solid #d8e2ec;
+  padding-bottom: 0.25em;
+}
+
+pre {
+  border-radius: 6px;
+  border: 1px solid #d8e2ec;
+  background: #f3f7fb;
+  padding: 0.9em 1em;
+}
+
+table.docutils {
+  border: 1px solid #d8e2ec;
+  border-collapse: collapse;
+  margin: 1.2em 0;
+}
+
+table.docutils th {
+  background: #e8f3fb;
+  color: #1f2933;
+  font-weight: 700;
+}
+
+table.docutils th,
+table.docutils td {
+  border: 1px solid #d8e2ec;
+  padding: 0.45em 0.7em;
+}
+
+code.literal {
+  color: #0f4f7d;
+  background: #eef6fb;
+  border: 1px solid #d8e2ec;
+  border-radius: 3px;
+  padding: 0.05em 0.25em;
+}
+
+div.body p,
+div.body li {
+  max-width: 82ch;
+}
+
+div.body .math {
+  overflow-x: auto;
+}
+
+div.sphinxsidebarwrapper {
+  padding-top: 0.4rem;
+}
+
+div.sphinxsidebar a {
+  color: #245d8f;
+}
